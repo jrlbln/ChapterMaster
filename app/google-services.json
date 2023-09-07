@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "619177579211",
+    "firebase_url": "https://chaptermaster-e510b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "chaptermaster-e510b",
+    "storage_bucket": "chaptermaster-e510b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619177579211:android:865c9ba13d03b5eb8fc14e",
+        "android_client_info": {
+          "package_name": "com.example.chaptermaster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "619177579211-a7j39dvho908k4ohlk1o0ep1kc8krqh2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWZlVBHyFbinwlEECMqy1em8T_ODBSRhI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "619177579211-a7j39dvho908k4ohlk1o0ep1kc8krqh2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
