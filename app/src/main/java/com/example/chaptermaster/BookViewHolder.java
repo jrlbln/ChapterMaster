@@ -29,4 +29,3 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
         Glide.with(itemView.getContext()).load(book.getImageUrl()).into(coverImageView);
     }
 }
-

@@ -18,9 +18,12 @@
 
         <ImageView
             android:id="@+id/bookCover"
-            android:layout_width="143dp"
+            android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
             tools:srcCompat="@drawable/ic_add" />
 
         <LinearLayout

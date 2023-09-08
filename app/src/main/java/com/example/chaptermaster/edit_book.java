@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -63,12 +66,10 @@ public class edit_book extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("bookId")) {
             bookId = intent.getStringExtra("bookId");
-            // Load book data based on bookId and populate the UI fields
+
             loadBookData();
         } else {
-            // Handle the case when bookId is null or not provided
             Toast.makeText(this, "Book ID is missing", Toast.LENGTH_SHORT).show();
-            // You may want to finish() this activity or navigate back to the previous activity here
         }
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -77,11 +78,9 @@ public class edit_book extends AppCompatActivity {
                 String title = bookTitleEditText.getText().toString();
                 String author = bookAuthorEditText.getText().toString();
 
-                // Check if selectedImageUri is not null before attempting to upload
                 if (selectedImageUri != null) {
                     uploadImageToStorage(title, author);
                 } else {
-                    // If selectedImageUri is null, save the book details without modifying the image URL
                     saveBookDetails(title, author, null);
                 }
             }
@@ -90,7 +89,6 @@ public class edit_book extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement book deletion logic here
                 deleteBook();
             }
         });
@@ -141,23 +139,19 @@ public class edit_book extends AppCompatActivity {
     private void saveBookDetails(String title, String author, String imageUrl) {
         DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books");
 
-        // Create a map to update only the provided fields
         Map<String, Object> updates = new HashMap<>();
         updates.put("title", title);
         updates.put("author", author);
 
         if (imageUrl != null) {
-            // Update the imageUrl only if it's provided
             updates.put("imageUrl", imageUrl);
         }
 
-        // Update the book data based on the bookId with the provided fields
         booksRef.child(bookId).updateChildren(updates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
                 if (databaseError == null) {
                     Toast.makeText(edit_book.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
-                    // Navigate back to MainActivity or any desired activity
                     finish();
                 } else {
                     Toast.makeText(edit_book.this, "Failed to update book", Toast.LENGTH_SHORT).show();
@@ -165,7 +159,6 @@ public class edit_book extends AppCompatActivity {
             }
         });
     }
-
 
     private void loadBookData() {
         DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books").child(bookId);
@@ -178,12 +171,13 @@ public class edit_book extends AppCompatActivity {
                         bookTitleEditText.setText(book.getTitle());
                         bookAuthorEditText.setText(book.getAuthor());
 
-                        // Load and set the book cover image here
                         if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
-                            // You can use a library like Picasso, Glide, or any other to load the image
-                            // For example, using Picasso:
-                            Picasso.get().load(book.getImageUrl()).into(bookCoverImageView);
-
+                            Glide.with(edit_book.this)
+                                    .load(book.getImageUrl())
+                                    .centerCrop()
+                                    .placeholder(R.drawable.ic_placeholder)
+                                    .transition(DrawableTransitionOptions.withCrossFade())
+                                    .into(bookCoverImageView);
                         }
                     }
                 }
@@ -196,7 +190,6 @@ public class edit_book extends AppCompatActivity {
         });
     }
 
-
     private void deleteBook() {
         DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books");
         booksRef.child(bookId).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -204,7 +197,6 @@ public class edit_book extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     Toast.makeText(edit_book.this, "Book deleted successfully", Toast.LENGTH_SHORT).show();
-                    // Navigate back to MainActivity or any desired activity
                     finish();
                 } else {
                     Toast.makeText(edit_book.this, "Failed to delete book", Toast.LENGTH_SHORT).show();

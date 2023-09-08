@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -74,10 +76,18 @@ public class add_book extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK) {
             selectedImageUri = data.getData();
-            bookCoverImageView.setImageURI(selectedImageUri);
-        }
 
+            bookCoverImageView.setImageURI(selectedImageUri);
+
+            Glide.with(this)
+                    .load(selectedImageUri)
+                    .centerCrop() // Crop the image to fit the ImageView
+                    .placeholder(R.drawable.ic_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(bookCoverImageView);
+        }
     }
+
 
     private void uploadImageToStorage(final String title, final String author) {
         if (selectedImageUri != null) {
@@ -97,7 +107,6 @@ public class add_book extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Uri> task) {
                                 if (task.isSuccessful()) {
                                     String imageUrl = task.getResult().toString();
-
                                     saveBookDetails(title, author, imageUrl);
                                 } else {
                                     Toast.makeText(add_book.this, "Image upload failed", Toast.LENGTH_SHORT).show();

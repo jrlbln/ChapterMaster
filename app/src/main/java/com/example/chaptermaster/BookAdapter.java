@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +69,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         holder.titleTextView.setText(book.getTitle());
         holder.authorTextView.setText(book.getAuthor());
 
-        // Load the book cover image using Glide or your preferred image loading library
-        Glide.with(context).load(book.getImageUrl()).into(holder.bookCoverImageView);
+        Glide.with(context)
+                .load(book.getImageUrl())
+                .centerCrop()
+                .placeholder(R.drawable.ic_placeholder)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.bookCoverImageView);
     }
 
     @Override

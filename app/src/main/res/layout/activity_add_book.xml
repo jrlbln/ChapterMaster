@@ -24,6 +24,9 @@
             android:id="@+id/bookImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/ic_add" />
     </androidx.cardview.widget.CardView>
 
