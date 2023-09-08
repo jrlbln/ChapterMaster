@@ -1,6 +1,7 @@
 package com.example.chaptermaster;
 
 public class Book {
+    private String id;
     private String title;
     private String author;
     private String imageUrl;
@@ -8,7 +9,8 @@ public class Book {
     public Book() {
     }
 
-    public Book(String title, String author, String imageUrl) {
+    public Book(String id, String title, String author, String imageUrl) {
+        this.id = id;
         this.title = title;
         this.author = author;
         this.imageUrl = imageUrl;
@@ -37,5 +39,12 @@ public class Book {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-}
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+}

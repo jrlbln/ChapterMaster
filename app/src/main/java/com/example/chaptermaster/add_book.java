@@ -117,12 +117,13 @@ public class add_book extends AppCompatActivity {
 
         String bookId = booksRef.push().getKey();
 
-        Map<String, Object> bookData = new HashMap<>();
-        bookData.put("title", title);
-        bookData.put("author", author);
-        bookData.put("imageUrl", imageUrl);
-
         if (bookId != null) {
+            Map<String, Object> bookData = new HashMap<>();
+            bookData.put("id", bookId);
+            bookData.put("title", title);
+            bookData.put("author", author);
+            bookData.put("imageUrl", imageUrl);
+
             booksRef.child(bookId).setValue(bookData)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

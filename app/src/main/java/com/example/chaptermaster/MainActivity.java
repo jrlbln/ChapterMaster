@@ -70,5 +70,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Database Error: " + databaseError.getMessage());
             }
         });
+
+        adapter.setOnItemClickListener(new BookAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                // Get the clicked book from the adapter
+                Book book = adapter.getBook(position);
+
+                // Start the Edit Book activity and pass book details
+                Intent intent = new Intent(MainActivity.this, edit_book.class);
+                intent.putExtra("bookId", book.getId()); // Pass book ID or other relevant data
+                startActivity(intent);
+            }
+        });
+
     }
+
 }
