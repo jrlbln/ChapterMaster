@@ -16,7 +16,7 @@
             android:name=".signUp"
             android:exported="false" />
         <activity
-            android:name=".signIn"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".edit_book"
@@ -25,7 +25,7 @@
             android:name=".add_book"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".signIn"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

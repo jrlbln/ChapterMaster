@@ -2,9 +2,11 @@ package com.example.chaptermaster;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +25,8 @@ public class signIn extends AppCompatActivity {
     private Button btnSignIn;
     private TextView tvSignUp;
     private LinearLayout linearLayout;
+    private ImageView confirmPasswordToggle;
+    private boolean isPasswordVisible = false;
 
     private FirebaseAuth mAuth;
 
@@ -33,9 +37,11 @@ public class signIn extends AppCompatActivity {
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        confirmPasswordToggle = findViewById(R.id.confirmPasswordToggle);
         btnSignIn = findViewById(R.id.btnSignIn);
         tvSignUp = findViewById(R.id.tvSignUp);
         linearLayout = findViewById(R.id.linearLayout);
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -43,6 +49,13 @@ public class signIn extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 signInUser(etEmail.getText().toString(), etPassword.getText().toString());
+            }
+        });
+
+        confirmPasswordToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                togglePasswordVisibility();
             }
         });
 
@@ -76,5 +89,21 @@ public class signIn extends AppCompatActivity {
                         }
                     }
                 });
+
+
+    }
+
+    private void togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible; // Toggle the password visibility flag
+
+        if (isPasswordVisible) {
+            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            confirmPasswordToggle.setImageResource(R.drawable.ic_eye); // Use the eye-off icon when password is visible
+        } else {
+            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            confirmPasswordToggle.setImageResource(R.drawable.ic_eye_off); // Use the eye icon when password is hidden
+        }
+
+        etPassword.setSelection(etPassword.getText().length()); // Keep the cursor at the end of the password field
     }
 }
