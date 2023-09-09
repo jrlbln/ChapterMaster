@@ -16,6 +16,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     private List<Book> books = new ArrayList<>();
@@ -72,6 +74,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         Glide.with(context)
                 .load(book.getImageUrl())
                 .centerCrop()
+                //.transform(new RoundedCorners(10))
                 .placeholder(R.drawable.ic_placeholder)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.bookCoverImageView);
