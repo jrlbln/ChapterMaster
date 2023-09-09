@@ -1,5 +1,6 @@
 package com.example.chaptermaster;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -62,7 +64,6 @@ public class signIn extends AppCompatActivity {
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Navigate to the sign-up activity when "Sign Up" text is clicked
                 Intent signUpIntent = new Intent(signIn.this, signUp.class);
                 startActivity(signUpIntent);
             }
@@ -75,35 +76,54 @@ public class signIn extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign-in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            // Navigate to MainActivity when sign-in is successful
                             Intent mainIntent = new Intent(signIn.this, MainActivity.class);
                             startActivity(mainIntent);
-                            finish(); // Close the sign-in activity
+                            finish();
                         } else {
-                            // If sign-in fails, display a message to the user.
                             FirebaseAuthException e = (FirebaseAuthException) task.getException();
-                            Toast.makeText(signIn.this, "Authentication failed: " + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                            String errorMessage = e.getMessage();
+
+                            if (errorMessage.contains("There is no user record corresponding to this identifier")) {
+                                showCreateAccountDialog();
+                            } else {
+                                Toast.makeText(signIn.this, "Authentication failed: " + errorMessage,
+                                        Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 });
-
-
     }
 
     private void togglePasswordVisibility() {
-        isPasswordVisible = !isPasswordVisible; // Toggle the password visibility flag
+        isPasswordVisible = !isPasswordVisible;
 
         if (isPasswordVisible) {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            confirmPasswordToggle.setImageResource(R.drawable.ic_eye); // Use the eye-off icon when password is visible
+            confirmPasswordToggle.setImageResource(R.drawable.ic_eye);
         } else {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            confirmPasswordToggle.setImageResource(R.drawable.ic_eye_off); // Use the eye icon when password is hidden
+            confirmPasswordToggle.setImageResource(R.drawable.ic_eye_off);
         }
 
-        etPassword.setSelection(etPassword.getText().length()); // Keep the cursor at the end of the password field
+        etPassword.setSelection(etPassword.getText().length());
     }
+
+    private void showCreateAccountDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("You don't have an account yet. Do you want to create one?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent signUpIntent = new Intent(signIn.this, signUp.class);
+                        startActivity(signUpIntent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.create().show();
+    }
+
 }

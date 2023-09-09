@@ -1,5 +1,6 @@
 package com.example.chaptermaster;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -57,39 +58,49 @@ public class signUp extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Retrieve user input
                 String name = etName.getText().toString().trim();
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
                 String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-                // Check if passwords match
-                if (!password.equals(confirmPassword)) {
-                    Toast.makeText(signUp.this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                String emailPattern = "^[A-Za-z0-9+_.-]+@(.+)$";
 
-                // Create a new user with Firebase Authentication
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(signUp.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign-up success, update UI or navigate to the next screen
-                                    Toast.makeText(signUp.this, "Sign-up successful!", Toast.LENGTH_SHORT).show();
-                                    // You can add code here to navigate to the next screen or update UI.
-                                } else {
-                                    // Sign-up failed, display an error message
-                                    if (task.getException() instanceof FirebaseAuthException) {
-                                        String errorCode = ((FirebaseAuthException) task.getException()).getErrorCode();
-                                        // Handle specific error codes if needed.
+                if (name.isEmpty()) {
+                    Toast.makeText(signUp.this, "Name is required.", Toast.LENGTH_SHORT).show();
+                } else if (!isAlpha(name)) {
+                    Toast.makeText(signUp.this, "Name can only contain alphabetic characters.", Toast.LENGTH_SHORT).show();
+                } else if (email.isEmpty()) {
+                    Toast.makeText(signUp.this, "Please Enter Email", Toast.LENGTH_SHORT).show();
+                } else if (!email.matches(emailPattern)) {
+                    Toast.makeText(signUp.this, "Invalid email format.", Toast.LENGTH_SHORT).show();
+                } else if (password.isEmpty()) {
+                    Toast.makeText(signUp.this, "Please Enter Password", Toast.LENGTH_SHORT).show();
+                } else if (password.length() < 8) {
+                    Toast.makeText(signUp.this, "Password must be 8 or more characters.", Toast.LENGTH_SHORT).show();
+                } else if (!password.equals(confirmPassword)) {
+                    Toast.makeText(signUp.this, "Passwords do not match.", Toast.LENGTH_SHORT).show();
+                } else {
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(signUp.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(signUp.this, "Sign-up successful!", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(signUp.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        if (task.getException() instanceof FirebaseAuthException) {
+                                            String errorCode = ((FirebaseAuthException) task.getException()).getErrorCode();
+                                        }
+                                        Toast.makeText(signUp.this, "Sign-up failed. Please try again.", Toast.LENGTH_SHORT).show();
                                     }
-                                    Toast.makeText(signUp.this, "Sign-up failed. Please try again.", Toast.LENGTH_SHORT).show();
                                 }
-                            }
-                        });
+                            });
+                }
             }
         });
+
     }
 
     private void togglePasswordVisibility() {
@@ -118,5 +129,9 @@ public class signUp extends AppCompatActivity {
         }
 
         etPassword.setSelection(etPassword.getText().length());
+    }
+
+    private boolean isAlpha(String s) {
+        return s != null && s.matches("^[a-zA-Z.\\s]*$");
     }
 }
