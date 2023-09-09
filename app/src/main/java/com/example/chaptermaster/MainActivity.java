@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,7 +44,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("books");
+        // Initialize Firebase Authentication
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        // Check if a user is authenticated
+        if (user == null) {
+            // Redirect to the sign-in activity if the user is not authenticated
+            Intent signInIntent = new Intent(MainActivity.this, signIn.class);
+            startActivity(signInIntent);
+            finish();
+            return;
+        }
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("user_books").child(user.getUid());
 
         recyclerView = findViewById(R.id.bookList);
         adapter = new BookAdapter();
@@ -113,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -165,4 +181,3 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 }
-

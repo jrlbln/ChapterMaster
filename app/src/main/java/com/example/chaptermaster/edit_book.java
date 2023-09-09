@@ -3,7 +3,7 @@ package com.example.chaptermaster;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +41,9 @@ public class edit_book extends AppCompatActivity {
     private ImageView bookCoverImageView;
     private Button saveButton;
     private Button deleteButton;
+    private String bookId;
 
     private Uri selectedImageUri = null;
-    private String bookId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,71 +138,86 @@ public class edit_book extends AppCompatActivity {
     }
 
     private void saveBookDetails(String title, String author, String imageUrl) {
-        DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("title", title);
-        updates.put("author", author);
+            DatabaseReference userBooksRef = FirebaseDatabase.getInstance().getReference("user_books").child(userId);
 
-        if (imageUrl != null) {
-            updates.put("imageUrl", imageUrl);
-        }
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("title", title);
+            updates.put("author", author);
 
-        booksRef.child(bookId).updateChildren(updates, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                if (databaseError == null) {
-                    Toast.makeText(edit_book.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(edit_book.this, "Failed to update book", Toast.LENGTH_SHORT).show();
-                }
+            if (imageUrl != null) {
+                updates.put("imageUrl", imageUrl);
             }
-        });
+
+            userBooksRef.child(bookId).updateChildren(updates, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        Toast.makeText(edit_book.this, "Book updated successfully", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(edit_book.this, "Failed to update book", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     private void loadBookData() {
-        DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books").child(bookId);
-        booksRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    Book book = dataSnapshot.getValue(Book.class);
-                    if (book != null) {
-                        bookTitleEditText.setText(book.getTitle());
-                        bookAuthorEditText.setText(book.getAuthor());
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
 
-                        if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
-                            Glide.with(edit_book.this)
-                                    .load(book.getImageUrl())
-                                    .centerCrop()
-                                    .placeholder(R.drawable.ic_placeholder)
-                                    .transition(DrawableTransitionOptions.withCrossFade())
-                                    .into(bookCoverImageView);
+            DatabaseReference userBooksRef = FirebaseDatabase.getInstance().getReference("user_books").child(userId).child(bookId);
+            userBooksRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Book book = dataSnapshot.getValue(Book.class);
+                        if (book != null) {
+                            bookTitleEditText.setText(book.getTitle());
+                            bookAuthorEditText.setText(book.getAuthor());
+
+                            if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
+                                Glide.with(edit_book.this)
+                                        .load(book.getImageUrl())
+                                        .centerCrop()
+                                        .placeholder(R.drawable.ic_placeholder)
+                                        .transition(DrawableTransitionOptions.withCrossFade())
+                                        .into(bookCoverImageView);
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(edit_book.this, "Failed to load book data", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(edit_book.this, "Failed to load book data", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void deleteBook() {
-        DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books");
-        booksRef.child(bookId).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(edit_book.this, "Book deleted successfully", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(edit_book.this, "Failed to delete book", Toast.LENGTH_SHORT).show();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+
+            DatabaseReference userBooksRef = FirebaseDatabase.getInstance().getReference("user_books").child(userId);
+            userBooksRef.child(bookId).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(edit_book.this, "Book deleted successfully", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(edit_book.this, "Failed to delete book", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

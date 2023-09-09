@@ -18,6 +18,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -122,33 +124,40 @@ public class add_book extends AppCompatActivity {
     }
 
     private void saveBookDetails(String title, String author, String imageUrl) {
-        DatabaseReference booksRef = FirebaseDatabase.getInstance().getReference("books");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
 
-        String bookId = booksRef.push().getKey();
+            DatabaseReference userBooksRef = FirebaseDatabase.getInstance().getReference("user_books").child(userId);
 
-        if (bookId != null) {
-            Map<String, Object> bookData = new HashMap<>();
-            bookData.put("id", bookId);
-            bookData.put("title", title);
-            bookData.put("author", author);
-            bookData.put("imageUrl", imageUrl);
+            // Generate a unique key for the book
+            String bookId = userBooksRef.push().getKey();
 
-            booksRef.child(bookId).setValue(bookData)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(add_book.this, "Book added successfully", Toast.LENGTH_SHORT).show();
+            if (bookId != null) {
+                Map<String, Object> bookData = new HashMap<>();
+                bookData.put("id", bookId);
+                bookData.put("title", title);
+                bookData.put("author", author);
+                bookData.put("imageUrl", imageUrl);
 
-                                Intent intent = new Intent(add_book.this, MainActivity.class);
-                                startActivity(intent);
+                userBooksRef.child(bookId).setValue(bookData)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(add_book.this, "Book added successfully", Toast.LENGTH_SHORT).show();
 
-                                finish();
-                            } else {
-                                Toast.makeText(add_book.this, "Failed to add book", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(add_book.this, MainActivity.class);
+                                    startActivity(intent);
+
+                                    finish();
+                                } else {
+                                    Toast.makeText(add_book.this, "Failed to add book", Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
+                        });
+            }
         }
     }
+
 }
