@@ -80,7 +80,11 @@ public class edit_book extends AppCompatActivity {
                 String author = bookAuthorEditText.getText().toString();
 
                 if (selectedImageUri != null) {
-                    uploadImageToStorage(title, author);
+                    if (isAuthorValid(author)) {
+                        uploadImageToStorage(title, author);
+                    } else {
+                        Toast.makeText(edit_book.this, "Invalid Entry", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     saveBookDetails(title, author, null);
                 }
@@ -111,29 +115,33 @@ public class edit_book extends AppCompatActivity {
 
             StorageReference imageRef = storageRef.child("book_covers/" + System.currentTimeMillis());
 
-            UploadTask uploadTask = imageRef.putFile(selectedImageUri);
+            if (isFileSizeValid(selectedImageUri)) {
+                UploadTask uploadTask = imageRef.putFile(selectedImageUri);
 
-            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        imageRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                if (task.isSuccessful()) {
-                                    String imageUrl = task.getResult().toString();
+                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            imageRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Uri> task) {
+                                    if (task.isSuccessful()) {
+                                        String imageUrl = task.getResult().toString();
 
-                                    saveBookDetails(title, author, imageUrl);
-                                } else {
-                                    Toast.makeText(edit_book.this, "Image upload failed", Toast.LENGTH_SHORT).show();
+                                        saveBookDetails(title, author, imageUrl);
+                                    } else {
+                                        Toast.makeText(edit_book.this, "Image upload failed", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
-                    } else {
-                        Toast.makeText(edit_book.this, "Image upload failed", Toast.LENGTH_SHORT).show();
+                            });
+                        } else {
+                            Toast.makeText(edit_book.this, "Image upload failed", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                Toast.makeText(edit_book.this, "Image size exceeds the limit (25MB)", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -218,6 +226,22 @@ public class edit_book extends AppCompatActivity {
                     }
                 }
             });
+        }
+    }
+
+    private boolean isAuthorValid(String author) {
+        return author != null && author.matches("^[a-zA-Z0-9 .]*$");
+    }
+
+    private boolean isFileSizeValid(Uri uri) {
+        try {
+            long fileSize = getContentResolver().openFileDescriptor(uri, "r").getStatSize();
+            long fileSizeInMB = fileSize / (1024 * 1024);
+
+            return fileSizeInMB <= 5;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
