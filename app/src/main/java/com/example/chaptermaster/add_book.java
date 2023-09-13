@@ -87,7 +87,7 @@ public class add_book extends AppCompatActivity {
 
             Glide.with(this)
                     .load(selectedImageUri)
-                    .centerCrop() // Crop the image to fit the ImageView
+                    .centerCrop()
                     .placeholder(R.drawable.ic_placeholder)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(bookCoverImageView);

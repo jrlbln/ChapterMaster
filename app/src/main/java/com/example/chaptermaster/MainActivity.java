@@ -44,13 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize Firebase Authentication
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
 
-        // Check if a user is authenticated
         if (user == null) {
-            // Redirect to the sign-in activity if the user is not authenticated
             Intent signInIntent = new Intent(MainActivity.this, signIn.class);
             startActivity(signInIntent);
             finish();
@@ -136,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Filter the books based on title or author as per user input
                 String query = s.toString().toLowerCase().trim();
                 filterBooks(query);
             }
