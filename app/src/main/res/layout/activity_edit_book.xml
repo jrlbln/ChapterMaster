@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_edit"
     tools:context=".add_book">
 
 
@@ -24,6 +25,7 @@
             android:id="@+id/bookImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#20053C"
             app:srcCompat="@drawable/ic_add" />
     </androidx.cardview.widget.CardView>
 

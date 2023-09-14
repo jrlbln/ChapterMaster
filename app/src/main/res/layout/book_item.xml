@@ -8,12 +8,14 @@
     android:layout_margin="10dp"
     android:elevation="5dp"
     android:orientation="horizontal"
+    android:background="@android:color/darker_gray"
     app:cardCornerRadius="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:orientation="horizontal"
+        android:background="#20053C"
         android:padding="10dp">
 
         <androidx.cardview.widget.CardView
@@ -30,6 +32,7 @@
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
+                android:background="#7B41EA"
                 tools:srcCompat="@drawable/ic_add" />
 
         </androidx.cardview.widget.CardView>

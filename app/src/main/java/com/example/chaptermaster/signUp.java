@@ -23,8 +23,6 @@ public class signUp extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText etName, etEmail, etPassword, etConfirmPassword;
     private Button btnSignUp;
-    private ImageView passwordToggle, confirmPasswordToggle;
-    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +36,7 @@ public class signUp extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
-        passwordToggle = findViewById(R.id.passwordToggle);
-        confirmPasswordToggle = findViewById(R.id.confirmPasswordToggle);
 
-        passwordToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                togglePasswordVisibility();
-            }
-        });
-
-        confirmPasswordToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleConfirmPasswordVisibility();
-            }
-        });
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,34 +84,6 @@ public class signUp extends AppCompatActivity {
             }
         });
 
-    }
-
-    private void togglePasswordVisibility() {
-        if (isPasswordVisible) {
-            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            isPasswordVisible = false;
-            passwordToggle.setImageResource(R.drawable.ic_eye_off);
-        } else {
-            etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            isPasswordVisible = true;
-            passwordToggle.setImageResource(R.drawable.ic_eye);
-        }
-
-        etPassword.setSelection(etPassword.getText().length());
-    }
-
-    private void toggleConfirmPasswordVisibility() {
-        if (isPasswordVisible) {
-            etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            isPasswordVisible = false;
-            confirmPasswordToggle.setImageResource(R.drawable.ic_eye_off);
-        } else {
-            etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            isPasswordVisible = true;
-            confirmPasswordToggle.setImageResource(R.drawable.ic_eye);
-        }
-
-        etPassword.setSelection(etPassword.getText().length());
     }
 
     private boolean isAlpha(String s) {
